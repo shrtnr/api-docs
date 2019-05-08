@@ -1,0 +1,146 @@
+openapi: 3.0.0
+info:
+  title: Shrtnr URL shortner
+  description: API documentation for the Shrtnr suite of open source URL shortners.
+  contact:
+    name: Nathan Fritz
+    url: http://nbfritz.com
+    email: nbfritz@gmail.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: "1.0.0"
+
+servers:
+  - url: http://localhost:3000/api
+
+paths:
+  /users/auth:
+    post:
+      description: "Authenticate a user"
+      requestBody:
+        description: "Authentication credentials"
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AuthCreds" }
+      responses:
+        200:
+          description: "Success with a bearer token."
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TokenResponse" }
+  /users:
+    get:
+      description: "Retrieve a list of users"
+      security:
+        - "BearerAuth": []
+      parameters:
+        - name: page
+          in: query
+          description: "Page of results to be displayed"
+          schema:
+            type: integer
+            example: 1
+      responses:
+        200:
+          description: "A list of users."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserList"
+                    
+components:
+  schemas:
+    AuthCreds:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: admin@example.com
+        password:
+          type: string
+          example: password
+        password_confirmation:
+          type: string
+          example: password
+      required:
+        - email
+        - password
+        - password_confirmation
+
+    TokenResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: ["ok"]
+        token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBleGFtcGxlLmNvbSJ9.pYqYBEbm52bgvPDMbFYydJMBwOSjVSSeGZ5w_tmtqCY"
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        email:
+          type: string
+          description: "Email address associated with user account"
+          format: email
+          example: "admin@example.com"
+        admin:
+          type: boolean
+          description: "True if the user is an adminstrator"
+          example: true
+        created_at:
+          type: string
+          description: "Date and time that the user was created"
+          format: "date-time"
+        updated_at:
+          type: string
+          description: "Date and time that the user was last updated"
+          format: "date-time"
+
+    UserList:
+      allOf:
+        - type: object
+          properties:
+            status:
+              type: string
+              description: "Status of the current operation"
+              enum: ["ok"]
+            users:
+              type: array
+              description: "List of user objects"
+              items:
+                $ref: "#/components/schemas/User"
+        - $ref: "#/components/schemas/PaginatedResults"
+
+    PaginatedResults:
+      type: object
+      properties:
+        total:
+          type: integer
+          description: "Total number of results available"
+          example: 1
+        page:
+          type: integer
+          description: "Page of results shown"
+          example: 1
+        per_page:
+          type: integer
+          description: "Number of results shown per page"
+          example: 20
+
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+
+
