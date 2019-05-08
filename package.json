@@ -7,11 +7,19 @@
     "doc": "docs"
   },
   "scripts": {
-    "start": "http-server ./docs"
+    "start": "http-server ./docs",
+    "lint": "speccy lint docs/openapi.yml || true",
+    "watch": "npm-watch"
+  },
+  "watch": {
+    "lint": { "patterns": "docs/openapi.yml", "legacyWatch": true },
+    "start": "{package.json,docs/index.html}"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "http-server": "^0.11.1"
+    "http-server": "^0.11.1",
+    "npm-watch": "^0.6.0",
+    "speccy": "^0.9.0"
   }
 }

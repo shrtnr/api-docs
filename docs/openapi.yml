@@ -14,10 +14,19 @@ info:
 servers:
   - url: http://localhost:3000/api
 
+tags:
+  - name: admin
+    description: Administrative endpoints
+  - name: user
+    description: User-restricted endpoints
+  - name: public 
+    description: Public endpoints
+
 paths:
   /users/auth:
     post:
-      description: "Authenticate a user"
+      description: Authenticate a user
+      operationId: userAuth
       requestBody:
         description: "Authentication credentials"
         required: true
@@ -26,19 +35,22 @@ paths:
             schema: { $ref: "#/components/schemas/AuthCreds" }
       responses:
         200:
-          description: "Success with a bearer token."
+          description: "Success with a JWT bearer token"
           content:
             application/json:
               schema: { $ref: "#/components/schemas/TokenResponse" }
+      tags:
+        - public
   /users:
     get:
       description: "Retrieve a list of users"
+      operationId: userGetList
       security:
         - "BearerAuth": []
       parameters:
         - name: page
           in: query
-          description: "Page of results to be displayed"
+          description: "Results page to be displayed (starts at 1)"
           schema:
             type: integer
             example: 1
@@ -49,7 +61,9 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserList"
-                    
+      tags:
+        - admin
+
 components:
   schemas:
     AuthCreds:
