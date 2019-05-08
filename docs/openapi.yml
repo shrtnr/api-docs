@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  title: Shrtnr URL shortner
+  title: Shrtnr URL shortener
   description: API documentation for the Shrtnr suite of open source URL shortners.
   contact:
     name: Nathan Fritz
@@ -39,14 +39,13 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/TokenResponse" }
-      tags:
-        - public
+      tags: [ public ]
+
   /users:
     get:
       description: "Retrieve a list of users"
       operationId: userGetList
-      security:
-        - "BearerAuth": []
+      security: [ { "BearerAuth": [] } ]
       parameters:
         - name: page
           in: query
@@ -59,10 +58,28 @@ paths:
           description: "A list of users."
           content:
             application/json:
+              schema: { $ref: "#/components/schemas/UserList" }
+      tags: [ admin ]
+
+    post:
+      description: "Create a new user"
+      operationId: userPost
+      security: [ { "BearerAuth": [] } ]
+      requestBody:
+        description: "Attributes defining a new user to be inserted"
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UserParams" }
+      responses:
+        201:
+          description: "Successfully created with location header set for new user"
+          headers:
+            Location:
+              description: "URL for the newly created user"
               schema:
-                $ref: "#/components/schemas/UserList"
-      tags:
-        - admin
+                type: string
+                example: "http://localhost/api/user/1"
+      tags: [ admin ]
 
 components:
   schemas:
@@ -87,51 +104,70 @@ components:
     TokenResponse:
       type: object
       properties:
-        status:
-          type: string
-          enum: ["ok"]
         token:
           type: string
           example: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBleGFtcGxlLmNvbSJ9.pYqYBEbm52bgvPDMbFYydJMBwOSjVSSeGZ5w_tmtqCY"
 
-    User:
+    UserCommon:
       type: object
       properties:
-        id:
-          type: integer
-          example: 1
         email:
           type: string
           description: "Email address associated with user account"
           format: email
           example: "admin@example.com"
-        admin:
-          type: boolean
-          description: "True if the user is an adminstrator"
-          example: true
-        created_at:
-          type: string
-          description: "Date and time that the user was created"
-          format: "date-time"
-        updated_at:
-          type: string
-          description: "Date and time that the user was last updated"
-          format: "date-time"
 
-    UserList:
+    UserParams:
+      type: object
+      properties:
+        user: 
+          allOf:
+            - $ref: "#/components/schemas/UserCommon"
+            - type: object
+              properties:
+                password:
+                  type: string
+                  description: "Password to be set for the user"
+                  format: password
+                  example: "password"
+                password_confirmation:
+                  type: string
+                  description: "Password a 2nd time for confirmation purposes"
+                  format: password 
+                  example: "password"
+
+    User:
       allOf:
         - type: object
           properties:
-            status:
+            id:
+              type: integer
+              example: 1
+        - $ref: "#/components/schemas/UserCommon"
+        - type: object
+          properties:
+            admin:
+              type: boolean
+              description: "True if the user is an administrator"
+              example: true
+            created_at:
               type: string
-              description: "Status of the current operation"
-              enum: ["ok"]
+              description: "Date and time that the user was created"
+              format: "date-time"
+            updated_at:
+              type: string
+              description: "Date and time that the user was last updated"
+              format: "date-time"
+
+    UserList:
+      allOf:
+        - $ref: "#/components/schemas/PaginatedResults"
+        - type: object
+          properties:
             users:
               type: array
               description: "List of user objects"
-              items:
-                $ref: "#/components/schemas/User"
-        - $ref: "#/components/schemas/PaginatedResults"
+              items: { $ref: "#/components/schemas/User" }
 
     PaginatedResults:
       type: object
@@ -149,6 +185,11 @@ components:
           description: "Number of results shown per page"
           example: 20
 
+    NotFoundError:
+      type: object
+      properties:
+        error_message:
+          type: string
 
   securitySchemes:
     BearerAuth:
