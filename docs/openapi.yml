@@ -43,6 +43,7 @@ paths:
                   token:
                     type: string
                     example: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBleGFtcGxlLmNvbSJ9.pYqYBEbm52bgvPDMbFYydJMBwOSjVSSeGZ5w_tmtqCY"
+        304: { $ref: "#/components/responses/UnauthorizedError" }
       tags: [ public ]
 
   /users:
@@ -66,6 +67,7 @@ paths:
                         type: array
                         description: "List of user objects"
                         items: { $ref: "#/components/schemas/User" }
+        304: { $ref: "#/components/responses/UnauthorizedError" }
       tags: [ admin ]
 
     post:
@@ -88,6 +90,7 @@ paths:
               schema:
                 type: string
                 example: "http://localhost/api/user/1"
+        304: { $ref: "#/components/responses/UnauthorizedError" }
         400: { $ref: "#/components/responses/BadRequestError" }
       tags: [ admin ]
 
@@ -113,6 +116,7 @@ paths:
               schema: 
                 properties:
                   user: { $ref: "#/components/schemas/User" }
+        304: { $ref: "#/components/responses/UnauthorizedError" }
         404: { $ref: "#/components/responses/NotFoundError" }
       tags: [ admin ]
 
@@ -136,6 +140,7 @@ paths:
               schema:
                 type: string
                 example: "http://localhost/api/user/1"
+        304: { $ref: "#/components/responses/UnauthorizedError" }
         400: { $ref: "#/components/responses/BadRequestError" }
         404: { $ref: "#/components/responses/NotFoundError" }
       tags: [ admin ]
@@ -147,6 +152,7 @@ paths:
       responses:
         200:
           description: "A successful deletion"
+        304: { $ref: "#/components/responses/UnauthorizedError" }
         404: { $ref: "#/components/responses/NotFoundError" }
       tags: [ admin ]
 
@@ -169,6 +175,7 @@ paths:
                         type: array
                         description: "List of shortcode objects"
                         items: { $ref: "#/components/schemas/Shortcode" }
+        304: { $ref: "#/components/responses/UnauthorizedError" }
       tags: [ user ]
 
     post:
@@ -191,6 +198,7 @@ paths:
               schema:
                 type: string
                 example: "http://localhost/api/shortcode/1"
+        304: { $ref: "#/components/responses/UnauthorizedError" }
         400: { $ref: "#/components/responses/BadRequestError" }
         404: { $ref: "#/components/responses/NotFoundError" }
       tags: [ user ]
@@ -218,6 +226,7 @@ paths:
               schema: 
                 properties:
                   shortcode: { $ref: "#/components/schemas/Shortcode" }
+        304: { $ref: "#/components/responses/UnauthorizedError" }
         404: { $ref: "#/components/responses/NotFoundError" }
       tags: [ user ]
 
@@ -241,6 +250,7 @@ paths:
               schema:
                 type: string
                 example: "http://localhost/api/shortcode/1"
+        304: { $ref: "#/components/responses/UnauthorizedError" }
         400: { $ref: "#/components/responses/BadRequestError" }
         404: { $ref: "#/components/responses/NotFoundError" }
       tags: [ user ]
@@ -252,6 +262,7 @@ paths:
       responses:
         200:
           description: "A successful deletion"
+        304: { $ref: "#/components/responses/UnauthorizedError" }
         404: { $ref: "#/components/responses/NotFoundError" }
       tags: [ user ]
 
@@ -283,6 +294,7 @@ paths:
                         type: array
                         description: "List of visit objects"
                         items: { $ref: "#/components/schemas/Visit" }
+        304: { $ref: "#/components/responses/UnauthorizedError" }
         404: { $ref: "#/components/responses/NotFoundError" }
       tags: [ user ]
 
@@ -390,6 +402,10 @@ components:
           type: string
           description: "Redirect target for this shortcode"
           example: "https://www.example.com"
+        user:
+          type: integer
+          description: "URL for the user who owns this shortcode"
+          example: "http://localhost:3000/user/1"
         created_at:
           type: string
           description: "Date and time that the shortcode was created"
@@ -424,6 +440,10 @@ components:
           type: string
           description: "User Agent reported by the client making the request"
           example: "Mozilla..."
+        shortcode:
+          type: string
+          description: "URL for the shortcode associated with this visit"
+          example: "http://localhost:3000/shortcode/1"
         created_at:
           type: string
           description: "Date and time that the shortcode was created"
@@ -488,6 +508,16 @@ components:
               error_message:
                 type: string
                 example: "user could not be found"
+
+    UnauthorizedError:
+      description: "Response indicating that the request is unauthorized"
+      content:
+        application/json:
+          schema: 
+            properties:
+              error_message:
+                type: string
+                example: "user is unauthorized"
 
 
   securitySchemes:
