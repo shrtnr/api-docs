@@ -38,7 +38,11 @@ paths:
           description: "Success with a JWT bearer token"
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/TokenResponse" }
+              schema:
+                properties:
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBleGFtcGxlLmNvbSJ9.pYqYBEbm52bgvPDMbFYydJMBwOSjVSSeGZ5w_tmtqCY"
       tags: [ public ]
 
   /users:
@@ -47,18 +51,21 @@ paths:
       operationId: userGetList
       security: [ { "BearerAuth": [] } ]
       parameters:
-        - name: page
-          in: query
-          description: "Results page to be displayed (starts at 1)"
-          schema:
-            type: integer
-            example: 1
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PerPage"
       responses:
         200:
-          description: "A list of users."
+          description: "A list of users"
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/UserList" }
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PaginatedResults"
+                  - properties:
+                      users:
+                        type: array
+                        description: "List of user objects"
+                        items: { $ref: "#/components/schemas/User" }
       tags: [ admin ]
 
     post:
@@ -69,7 +76,9 @@ paths:
         description: "Attributes defining a new user to be inserted"
         content:
           application/json:
-            schema: { $ref: "#/components/schemas/UserParams" }
+            schema: 
+              properties: 
+                user: { $ref: "#/components/schemas/UserParams" }
       responses:
         201:
           description: "Successfully created with location header set for new user"
@@ -79,12 +88,233 @@ paths:
               schema:
                 type: string
                 example: "http://localhost/api/user/1"
+        400: { $ref: "#/components/responses/BadRequestError" }
       tags: [ admin ]
+
+  /users/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: "ID for the user being displayed, updated, or deleted"
+        schema:
+          type: integer
+          example: 1
+        required: true
+
+    get:
+      description: "Retrieve a single user"
+      operationId: userGet
+      security: [ { "BearerAuth": [] } ]
+      responses:
+        200:
+          description: "A single user"
+          content:
+            application/json:
+              schema: 
+                properties:
+                  user: { $ref: "#/components/schemas/User" }
+        404: { $ref: "#/components/responses/NotFoundError" }
+      tags: [ admin ]
+
+    put:
+      description: "Update an existing user"
+      operationId: userPut
+      security: [ { "BearerAuth": [] } ]
+      requestBody:
+        description: "Attributes defining new values for the existing user"
+        content:
+          application/json:
+            schema:
+              properties: 
+                user: { $ref: "#/components/schemas/UserParams" }
+      responses:
+        200:
+          description: "Successfully updated with location header set for existing user"
+          headers:
+            Location:
+              description: "URL for the updated user"
+              schema:
+                type: string
+                example: "http://localhost/api/user/1"
+        400: { $ref: "#/components/responses/BadRequestError" }
+        404: { $ref: "#/components/responses/NotFoundError" }
+      tags: [ admin ]
+
+    delete:
+      description: "Remove a user from the system"
+      operationId: userDelete
+      security: [ { "BearerAuth": [] } ]
+      responses:
+        200:
+          description: "A successful deletion"
+        404: { $ref: "#/components/responses/NotFoundError" }
+      tags: [ admin ]
+
+
+  /shortcodes:
+    get:
+      description: "Retrieve a list of shortcodes associated with the current user"
+      operationId: shortcodeGetList
+      security: [ { "BearerAuth": [] } ]
+      responses: 
+        200:
+          description: "A list of shortcodes"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PaginatedResults"
+                  - properties:
+                      shortcodes:
+                        type: array
+                        description: "List of shortcode objects"
+                        items: { $ref: "#/components/schemas/Shortcode" }
+      tags: [ user ]
+
+    post:
+      description: "Create a new shortcode associated with the current user"
+      operationId: shortcodePost
+      security: [ { "BearerAuth": [] } ]
+      requestBody:
+        description: "Attributes defining new values for the new shortcode"
+        content:
+          application/json:
+            schema:
+              properties: 
+                shortcode: { $ref: "#/components/schemas/ShortcodeParams" }
+      responses:
+        201:
+          description: "Successfully created with location header set for new shortcode"
+          headers:
+            Location:
+              description: "URL for the new shortcode"
+              schema:
+                type: string
+                example: "http://localhost/api/shortcode/1"
+        400: { $ref: "#/components/responses/BadRequestError" }
+        404: { $ref: "#/components/responses/NotFoundError" }
+      tags: [ user ]
+
+
+  /shortcode/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: "ID for the shortcode being displayed, updated, or deleted"
+        schema:
+          type: integer
+          example: 1
+        required: true
+
+    get:
+      description: "Retrieve a single shortcode"
+      operationId: shortcodeGet
+      security: [ { "BearerAuth": [] } ]
+      responses:
+        200:
+          description: "A single shortcode"
+          content:
+            application/json:
+              schema: 
+                properties:
+                  shortcode: { $ref: "#/components/schemas/Shortcode" }
+        404: { $ref: "#/components/responses/NotFoundError" }
+      tags: [ user ]
+
+    put:
+      description: ""
+      operationId: shortcodePut
+      security: [ { "BearerAuth": [] } ]
+      requestBody:
+        description: "Attributes defining new values for the existing shortcode"
+        content:
+          application/json:
+            schema:
+              properties: 
+                shortcode: { $ref: "#/components/schemas/ShortcodeParams" }
+      responses:
+        200:
+          description: "Successfully updated with location header set for existing shortcode"
+          headers:
+            Location:
+              description: "URL for the updated shortcode"
+              schema:
+                type: string
+                example: "http://localhost/api/shortcode/1"
+        400: { $ref: "#/components/responses/BadRequestError" }
+        404: { $ref: "#/components/responses/NotFoundError" }
+      tags: [ user ]
+
+    delete:
+      description: ""
+      operationId: shortcodeDelete
+      security: [ { "BearerAuth": [] } ]
+      responses:
+        200:
+          description: "A successful deletion"
+        404: { $ref: "#/components/responses/NotFoundError" }
+      tags: [ user ]
+
+
+  /shortcode/{id}/visits:
+    parameters:
+      - name: id
+        in: path
+        description: "ID for the shortcode for which to display the visit list"
+        schema:
+          type: integer
+          example: 1
+        required: true
+
+    get:
+      description: "Retrieve a list of visits resolved via a given shortcode"
+      operationId: shortcodeVisitsGet
+      security: [ { "BearerAuth": [] } ]
+      responses: 
+        200:
+          description: "A list of visits for the requested shortcode"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PaginatedResults"
+                  - properties:
+                      visits:
+                        type: array
+                        description: "List of visit objects"
+                        items: { $ref: "#/components/schemas/Visit" }
+        404: { $ref: "#/components/responses/NotFoundError" }
+      tags: [ user ]
+
+
+  /{key}:
+    parameters:
+      - name: key
+        in: path
+        description: "Shortcode key to resolve via a 302 redirect"
+        schema:
+          type: string
+          example: "abc123"
+        required: true
+
+    get:
+      description: "Resolve a shortcode to a url"
+      operationId: shortcodeResolve
+      responses: 
+        302:
+          description: "Redirect response to send client to appropriate URL"
+          headers:
+            Location:
+              description: "Redirect target for the resolved shortcode"
+              schema:
+                type: string
+                example: "https://www.example.com"
+        404: { $ref: "#/components/responses/NotFoundError" }
+      tags: [ public ]
 
 components:
   schemas:
     AuthCreds:
-      type: object
       properties:
         email:
           type: string
@@ -93,84 +323,118 @@ components:
         password:
           type: string
           example: password
-        password_confirmation:
-          type: string
-          example: password
-      required:
-        - email
-        - password
-        - password_confirmation
+      required: [ email, password ]
 
-    TokenResponse:
-      type: object
-      properties:
-        token:
-          type: string
-          example: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBleGFtcGxlLmNvbSJ9.pYqYBEbm52bgvPDMbFYydJMBwOSjVSSeGZ5w_tmtqCY"
-
-    UserCommon:
-      type: object
+    UserParams:
       properties:
         email:
           type: string
           description: "Email address associated with user account"
           format: email
           example: "admin@example.com"
-
-    UserParams:
-      type: object
-      properties:
-        user: 
-          allOf:
-            - $ref: "#/components/schemas/UserCommon"
-            - type: object
-              properties:
-                password:
-                  type: string
-                  description: "Password to be set for the user"
-                  format: password
-                  example: "password"
-                password_confirmation:
-                  type: string
-                  description: "Password a 2nd time for confirmation purposes"
-                  format: password 
-                  example: "password"
+        password:
+          type: string
+          description: "Password to be set for the user"
+          format: password
+          example: "password"
+        password_confirmation:
+          type: string
+          description: "Password a 2nd time for confirmation purposes"
+          format: password 
+          example: "password"
+      required: [ email, password, password_confirmation ]
 
     User:
-      allOf:
-        - type: object
-          properties:
-            id:
-              type: integer
-              example: 1
-        - $ref: "#/components/schemas/UserCommon"
-        - type: object
-          properties:
-            admin:
-              type: boolean
-              description: "True if the user is an administrator"
-              example: true
-            created_at:
-              type: string
-              description: "Date and time that the user was created"
-              format: "date-time"
-            updated_at:
-              type: string
-              description: "Date and time that the user was last updated"
-              format: "date-time"
+      properties:
+        id:
+          type: integer
+          example: 1
+        email:
+          type: string
+          description: "Email address associated with user account"
+          format: email
+        admin:
+          type: boolean
+          description: "True if the user is an administrator"
+          example: true
+        created_at:
+          type: string
+          description: "Date and time that the user was created"
+          format: "date-time"
+        updated_at:
+          type: string
+          description: "Date and time that the user was last updated"
+          format: "date-time"
 
-    UserList:
-      allOf:
-        - $ref: "#/components/schemas/PaginatedResults"
-        - type: object
-          properties:
-            users:
-              type: array
-              description: "List of user objects"
-              items: { $ref: "#/components/schemas/User" }
+    ShortcodeParams:
+      properties:
+        key:
+          type: string
+          description: "Key to be used for resolving the shortcode"
+          example: "abc123"
+        url:
+          type: string
+          description: "Redirect target for this shortcode"
+          example: "https://www.example.com"
+
+    Shortcode:
+      properties:
+        id:
+          type: integer
+          example: 1
+        key:
+          type: string
+          description: "Key to be used for resolving the shortcode"
+          example: "abc123"
+        url:
+          type: string
+          description: "Redirect target for this shortcode"
+          example: "https://www.example.com"
+        created_at:
+          type: string
+          description: "Date and time that the shortcode was created"
+          format: "date-time"
+        updated_at:
+          type: string
+          description: "Date and time that the shortcode  was last updated"
+          format: "date-time"
+
+    Visit:
+      properties:
+        id:
+          type: integer
+          example: 1
+        remote_ip:
+          type: string
+          description: "IP address for the visitor"
+          example: "10.10.10.1"
+        request:
+          type: string
+          description: "URL used to access resolver"
+          example: "http://localhost:3000/abc123"
+        target:
+          type: string
+          description: "URL used for resulting redirect"
+          example: "https://www.example.com"
+        referrer:
+          type: string
+          description: "HTTP Referrer associated with the request"
+          example: "https://www.example.com/some-other-page"
+        user_agent:
+          type: string
+          description: "User Agent reported by the client making the request"
+          example: "Mozilla..."
+        created_at:
+          type: string
+          description: "Date and time that the shortcode was created"
+          format: "date-time"
+        updated_at:
+          type: string
+          description: "Date and time that the shortcode  was last updated"
+          format: "date-time"
+
 
     PaginatedResults:
-      type: object
       properties:
         total:
           type: integer
@@ -185,11 +449,46 @@ components:
           description: "Number of results shown per page"
           example: 20
 
+  parameters:
+    Page:
+      name: page
+      in: query
+      description: "Results page to be displayed (starts at 1)"
+      schema:
+        type: integer
+        example: 1
+    PerPage:
+      name: per_page
+      in: query
+      description: "Number of results to be displayed per page (defaults to 20)"
+      schema:
+        type: integer
+        example: 20
+
+  responses:
+    BadRequestError:
+      description: "Response including a map of attributes to error messages"
+      content:
+        application/json:
+          schema: 
+            properties:
+              error_messages:
+                additionalProperties:
+                  type: string
+                example:
+                  email: "can't be blank"
+                  password: "can't be blank"
+
     NotFoundError:
-      type: object
-      properties:
-        error_message:
-          type: string
+      description: "Response indicating that an entity was not found in the system"
+      content:
+        application/json:
+          schema: 
+            properties:
+              error_message:
+                type: string
+                example: "user could not be found"
+
 
   securitySchemes:
     BearerAuth:

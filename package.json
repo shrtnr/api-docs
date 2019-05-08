@@ -9,10 +9,14 @@
   "scripts": {
     "start": "http-server ./docs",
     "lint": "speccy lint docs/openapi.yml || true",
-    "watch": "npm-watch"
+    "watch": "npm-watch",
+    "update-themes": "cp node_modules/swagger-ui-themes/themes/3.x/theme*.css docs/swagger"
   },
   "watch": {
-    "lint": { "patterns": "docs/openapi.yml", "legacyWatch": true },
+    "lint": {
+      "patterns": "docs/openapi.yml",
+      "legacyWatch": true
+    },
     "start": "{package.json,docs/index.html}"
   },
   "author": "",
@@ -20,6 +24,8 @@
   "dependencies": {
     "http-server": "^0.11.1",
     "npm-watch": "^0.6.0",
-    "speccy": "^0.9.0"
+    "speccy": "^0.9.0",
+    "swagger-ui-dist": "^3.22.1",
+    "swagger-ui-themes": "^3.0.0"
   }
 }

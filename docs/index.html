@@ -1,10 +1,29 @@
-<!doctype html> <!-- Important: must specify -->
-<html>
-  <head>
-    <meta charset="utf-8"> <!-- Important: rapi-doc uses utf8 charecters -->
-    <script src="https://unpkg.com/rapidoc/dist/rapidoc-min.js"></script>
-  </head>
-  <body>
-    <rapi-doc spec-url="./openapi.yml" show-header="false"></rapi-doc>
-  </body> 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Shrtnr API Documentation</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Shrtnr API Documentation</h1>
+
+    <p>
+      The Shrtnr service API documentation is available as an OpenAPI 3.0 YAML document via
+      the GitHub repository at <a href="https://github.com/shrtnr/api-docs">
+      https://github.com/shrtnr/api-docs</a> or directly <a href="./openapi.yml">here</a>.
+    </p>
+
+    <p>
+      Alternatively, the API docs can be viewed using one of the following viewers:
+    </p>
+
+    <p>
+      <a href="./swagger" class="btn">Swagger UI</a>
+      <a href="./redoc" class="btn">ReDoc</a>
+      <a href="./rapidoc" class="btn">RapiDoc</a>
+    </p>
+  </div>
+</body>
 </html>
