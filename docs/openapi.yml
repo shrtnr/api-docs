@@ -12,7 +12,7 @@ info:
   version: "1.0.0"
 
 servers:
-  - url: http://localhost:3000/api
+  - url: http://localhost:3000
 
 tags:
   - name: admin
@@ -23,7 +23,7 @@ tags:
     description: Public endpoints
 
 paths:
-  /users/auth:
+  /api/users/auth:
     post:
       description: Authenticate a user
       operationId: userAuth
@@ -46,7 +46,7 @@ paths:
         304: { $ref: "#/components/responses/UnauthorizedError" }
       tags: [ public ]
 
-  /users:
+  /api/users:
     get:
       description: "Retrieve a list of users"
       operationId: userGetList
@@ -89,12 +89,12 @@ paths:
               description: "URL for the newly created user"
               schema:
                 type: string
-                example: "http://localhost/api/user/1"
+                example: "http://localhost/api/users/1"
         304: { $ref: "#/components/responses/UnauthorizedError" }
         400: { $ref: "#/components/responses/BadRequestError" }
       tags: [ admin ]
 
-  /users/{id}:
+  /api/users/{id}:
     parameters:
       - name: id
         in: path
@@ -139,7 +139,7 @@ paths:
               description: "URL for the updated user"
               schema:
                 type: string
-                example: "http://localhost/api/user/1"
+                example: "http://localhost/api/users/1"
         304: { $ref: "#/components/responses/UnauthorizedError" }
         400: { $ref: "#/components/responses/BadRequestError" }
         404: { $ref: "#/components/responses/NotFoundError" }
@@ -157,7 +157,7 @@ paths:
       tags: [ admin ]
 
 
-  /shortcodes:
+  /api/shortcodes:
     get:
       description: "Retrieve a list of shortcodes associated with the current user"
       operationId: shortcodeGetList
@@ -197,14 +197,14 @@ paths:
               description: "URL for the new shortcode"
               schema:
                 type: string
-                example: "http://localhost/api/shortcode/1"
+                example: "http://localhost/api/shortcodes/1"
         304: { $ref: "#/components/responses/UnauthorizedError" }
         400: { $ref: "#/components/responses/BadRequestError" }
         404: { $ref: "#/components/responses/NotFoundError" }
       tags: [ user ]
 
 
-  /shortcode/{id}:
+  /api/shortcodes/{id}:
     parameters:
       - name: id
         in: path
@@ -249,7 +249,7 @@ paths:
               description: "URL for the updated shortcode"
               schema:
                 type: string
-                example: "http://localhost/api/shortcode/1"
+                example: "http://localhost/api/shortcodes/1"
         304: { $ref: "#/components/responses/UnauthorizedError" }
         400: { $ref: "#/components/responses/BadRequestError" }
         404: { $ref: "#/components/responses/NotFoundError" }
@@ -267,7 +267,7 @@ paths:
       tags: [ user ]
 
 
-  /shortcode/{id}/visits:
+  /api/shortcodes/{id}/visits:
     parameters:
       - name: id
         in: path
@@ -405,7 +405,7 @@ components:
         user:
           type: integer
           description: "URL for the user who owns this shortcode"
-          example: "http://localhost:3000/user/1"
+          example: "http://localhost:3000/users/1"
         created_at:
           type: string
           description: "Date and time that the shortcode was created"
@@ -443,7 +443,7 @@ components:
         shortcode:
           type: string
           description: "URL for the shortcode associated with this visit"
-          example: "http://localhost:3000/shortcode/1"
+          example: "http://localhost:3000/shortcodes/1"
         created_at:
           type: string
           description: "Date and time that the shortcode was created"
@@ -496,7 +496,7 @@ components:
                 additionalProperties:
                   type: string
                 example:
-                  email: "can't be blank"
+                  email: "must be unique"
                   password: "can't be blank"
 
     NotFoundError:
